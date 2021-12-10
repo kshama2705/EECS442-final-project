@@ -79,6 +79,39 @@ def modelSummary():
     summary(m2, input_size=(8, 3, 320, 320), device="cpu")
     print(2222)           
 
+# set video file path of input video with name and extension
+def video_to_frames(inputpath,outputpath):
+    vid = cv2.VideoCapture(inputpath)
+    if not os.path.exists('images'):
+        os.makedirs('images')
+    #for frame identity
+    index = 0
+    while(True):
+        # Extract images
+        ret, frame = vid.read()
+        # end of frames
+        if not ret: 
+            break
+        name = './images/frame' + str(index) + '.jpg'
+        #print ('Creating...' + name)
+        cv2.imwrite(name, frame)
+        # next frame
+        index += 1
+        
+def frames_to_video(inputpath,outputpath,fps):
+   image_array = []
+   files = [f for f in os.listdir(inputpath) if isfile(join(inputpath, f))]
+   files.sort(key = lambda x: int(x[5:-4]))
+   for i in range(len(files)):
+       img = cv2.imread(inputpath + files[i])
+       size =  (img.shape[1],img.shape[0])
+       img = cv2.resize(img,size)
+       image_array.append(img)
+   fourcc = cv2.VideoWriter_fourcc('D', 'I', 'V', 'X')
+   out = cv2.VideoWriter(outputpath,fourcc, fps, size)
+   for i in range(len(image_array)):
+       out.write(image_array[i])
+   out.release()
 
 def showInference(model_path, img_path):
     model = torch.load(model_path)
